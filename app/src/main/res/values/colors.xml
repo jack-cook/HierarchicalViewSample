@@ -28,4 +28,5 @@
     <color name="white">#ffffff</color>
     <color name="bg_light">#e2e2e2</color>
     <color name="bg_dark">#c4c4c4</color>
+    <color name="yellow">#e9dc7f</color>
 </resources>

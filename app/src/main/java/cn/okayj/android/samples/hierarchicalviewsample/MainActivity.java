@@ -17,46 +17,45 @@
 package cn.okayj.android.samples.hierarchicalviewsample;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.List;
 
-import cn.okayj.android.samples.hierarchicalviewsample.entry.Cart;
-import cn.okayj.android.samples.hierarchicalviewsample.entry.Goods;
-import cn.okayj.android.samples.hierarchicalviewsample.model.CartNode;
-import cn.okayj.android.samples.hierarchicalviewsample.model.GoodsFooterNode;
-import cn.okayj.android.samples.hierarchicalviewsample.model.GoodsNode;
-import cn.okayj.android.samples.hierarchicalviewsample.model.ShopNode;
+import cn.okayj.android.samples.hierarchicalviewsample.entry.Group;
+import cn.okayj.android.samples.hierarchicalviewsample.model.ChildGroupNode;
+import cn.okayj.android.samples.hierarchicalviewsample.model.GroupNode;
+import cn.okayj.android.samples.hierarchicalviewsample.model.ItemNode;
+import cn.okayj.android.samples.hierarchicalviewsample.model.RootNode;
 import cn.okayj.android.samples.hierarchicalviewsample.model.TreeBuilder;
 import cn.okayj.android.samples.hierarchicalviewsample.ui.DividerItemDecoration;
 import cn.okayj.util.DataNode;
 import cn.okayj.util.NodeFlatIndex;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String LOG_TAG = "MainActivity";
+
+    List<Group> groupList;
+    RootNode rootNode;
+    NodeFlatIndex.VisibleFlatIndex index;
 
     RecyclerView recyclerView;
 
-    Cart cart;//购物车数据(树形)
-
-    CartNode cartNode;//购物车根节点
-
-    NodeFlatIndex.VisibleFlatIndex index;//购物车的可见索引
-
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init();
         setContentView(R.layout.activity_main);
@@ -66,20 +65,17 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(new Adapter());
     }
 
-    /**
-     * 初始化,将json数据转成对象
-     */
     private void init(){
         InputStreamReader isr = null;
         BufferedReader br = null;
         try {
-            isr = new InputStreamReader(getAssets().open("shop_cart.js"));
+            isr = new InputStreamReader(getAssets().open("data.js"));
             br = new BufferedReader(isr);
-            cart = new Gson().fromJson(br,Cart.class);
+            groupList = new Gson().fromJson(br,new TypeToken<List<Group>>(){}.getType());
         }catch (JsonIOException e) {
-            e.printStackTrace();
+            Log.d(LOG_TAG,e.getMessage());
         }catch (Exception e){
-            e.printStackTrace();
+            Log.d(LOG_TAG,e.getMessage());
         }finally {
             if(br != null){
                 try {
@@ -90,185 +86,27 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if(cart != null){
-            cartNode = TreeBuilder.buildCartNode(cart);
-            NodeFlatIndex nodeFlatIndex = cartNode.getFlatIndex();
+        if(groupList != null){
+            rootNode = TreeBuilder.buildRootNode(groupList);
+            NodeFlatIndex nodeFlatIndex = rootNode.getFlatIndex();
             nodeFlatIndex.ignoreRoot(true);
             index = nodeFlatIndex.getVisibleIndex();
         }
     }
 
-    /**
-     * 列表item 的 base view holder
-     * @param <S>
-     */
-    private abstract class BaseViewHolder<S> extends RecyclerView.ViewHolder{
-        private S s;
-
-        public BaseViewHolder(View itemView) {
-            super(itemView);
-        }
-
-        /**
-         * 设置 holder 数据
-         * @param s
-         * @return
-         */
-        public BaseViewHolder setData(DataNode s){
-            this.s = (S)s;
-            onDataSet((S)s);
-            return this;
-        }
-
-        /**
-         * 后去holder 数据
-         * @return
-         */
-        public S getData(){
-            return s;
-        }
-
-        /**
-         * 子类在该方法中更新视图
-         * @param s
-         */
-        protected abstract void onDataSet(S s);
-    }
-
-    /**
-     * 店铺
-     */
-    private class ShopViewHolder extends BaseViewHolder<ShopNode> {
-        public static final int LAYOUT = R.layout.item_shop;
-
-        public TextView mTitleTextView;
-
-        public ImageView mArrowView;
-
-        public ShopViewHolder(View itemView) {
-            super(itemView);
-            mTitleTextView = (TextView) itemView.findViewById(R.id.title);
-            mArrowView = (ImageView) itemView.findViewById(R.id.arrow);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    DataNode node = getData();
-                    node.setIsFolded(!node.isFold());
-                    recyclerView.getAdapter().notifyDataSetChanged();
-                }
-            });
-        }
-
-        @Override
-        public void onDataSet(ShopNode shopNode) {
-            mTitleTextView.setText(shopNode.getSource().getName());
-            if(shopNode.isFold()){
-                mArrowView.getDrawable().setLevel(0);
-            }else {
-                mArrowView.getDrawable().setLevel(1);
-            }
-        }
-    }
-
-    /**
-     * 商品
-     */
-    private class GoodViewHolder extends BaseViewHolder<GoodsNode>{
-        public static final int LAYOUT = R.layout.item_goods;
-
-        public TextView mTitleTextView;
-
-        public TextView mPriceView;
-
-        public TextView mNumberView;
-
-        public Button mButton;
-
-        public View mFooterView;
-
-        public GoodsFooterViewHolder mFooterViewHolder;
-
-        public GoodViewHolder(View itemView) {
-            super(itemView);
-            mTitleTextView = (TextView) itemView.findViewById(R.id.title);
-            mPriceView = (TextView) itemView.findViewById(R.id.price);
-            mNumberView = (TextView) itemView.findViewById(R.id.number);
-            mButton = (Button) itemView.findViewById(R.id.button);
-            mFooterView = itemView.findViewById(R.id.footer);
-            mFooterViewHolder = new GoodsFooterViewHolder(mFooterView);
-            mButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    DataNode node = getData();
-                    node.setIsFolded(!node.isFold());
-                    recyclerView.getAdapter().notifyDataSetChanged();
-                }
-            });
-        }
-
-        @Override
-        public void onDataSet(GoodsNode goodsNode) {
-            mTitleTextView.setText(goodsNode.getSource().getName());
-            mPriceView.setText(goodsNode.getSource().getPrice()+"元");
-            mNumberView.setText(goodsNode.getSource().getNumber()+"");
-
-            if(goodsNode.getParentNode() instanceof GoodsNode){
-                itemView.getBackground().setLevel(1);
-            }else {
-                itemView.getBackground().setLevel(0);
-            }
-            if(goodsNode.isFold()){
-                mButton.setText("展开/expand");
-            }else {
-                mButton.setText("收起/collapse");
-            }
-            if(goodsNode.getSource().getGoods().size() > 0){
-                mButton.setVisibility(View.VISIBLE);
-            }else {
-                mButton.setVisibility(View.GONE);
-            }
-
-            mFooterViewHolder.setData(goodsNode);
-            if(goodsNode.getSource().getGoods().size() > 0 && goodsNode.isFold()){
-                mFooterViewHolder.itemView.setVisibility(View.VISIBLE);
-            }else {
-                mFooterViewHolder.itemView.setVisibility(View.GONE);
-            }
-        }
-    }
-
-    /**
-     * 组合商品的footer
-     */
-    private class GoodsFooterViewHolder extends BaseViewHolder<DataNode>{
-        public static final int LAYOUT = R.layout.item_goods_footer;
-
-        private TextView mNumberView;
-
-        public GoodsFooterViewHolder(View itemView) {
-            super(itemView);
-            mNumberView = (TextView) itemView.findViewById(R.id.number);
-        }
-
-        @Override
-        protected void onDataSet(DataNode node) {
-            mNumberView.setText(((Goods)node.getSource()).getGoods().size()+"");
-        }
-    }
-
-    private class Adapter extends RecyclerView.Adapter<BaseViewHolder>{
+    private class Adapter extends RecyclerView.Adapter<BaseViewHolder> {
         @Override
         public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(viewType,parent,false);
             switch (viewType){
-                case GoodViewHolder.LAYOUT:
-                    return new GoodViewHolder(view);
-                case ShopViewHolder.LAYOUT:
-                    return new ShopViewHolder(view);
-                case GoodsFooterViewHolder.LAYOUT:
-                    return new GoodsFooterViewHolder(view);
+                case ItemViewHolder.LAYOUT:
+                    return new ItemViewHolder(view);
+                case ChildGroupViewHolder.LAYOUT:
+                    return new ChildGroupViewHolder(view);
+                case GroupViewHolder.LAYOUT:
+                    return new GroupViewHolder(view);
                 default:
-                    throw new IllegalStateException();
+                    throw new IllegalStateException("unchecked view type");
             }
         }
 
@@ -284,19 +122,102 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getItemViewType(int position) {
-            /*
-            直接将res id 作为 view type
-             */
             DataNode node = index.get(position);
-            if(node instanceof ShopNode){
-                return ShopViewHolder.LAYOUT;
-            }else if(node instanceof GoodsNode){
-                return GoodViewHolder.LAYOUT;
-            }else if(node instanceof GoodsFooterNode){
-                return GoodsFooterViewHolder.LAYOUT;
+            if(node instanceof ItemNode){
+                return ItemViewHolder.LAYOUT;
+            }else if(node instanceof ChildGroupNode){
+                return ChildGroupViewHolder.LAYOUT;
+            }else if(node instanceof GroupNode){
+                return GroupViewHolder.LAYOUT;
             }else {
-                throw new IllegalStateException();
+                throw new IllegalStateException("unchecked data type");
             }
+        }
+    }
+
+    private abstract class BaseViewHolder<D> extends RecyclerView.ViewHolder {
+        private D data;
+
+        public BaseViewHolder(View itemView) {
+            super(itemView);
+        }
+
+        public BaseViewHolder setData(Object d){
+            data = (D)d;
+            onDataSet(data);
+            return this;
+        }
+
+        public D getData(){
+            return data;
+        }
+
+        protected abstract void onDataSet(D d);
+
+    }
+
+    private class GroupViewHolder extends BaseViewHolder<GroupNode>{
+        public static final int LAYOUT = R.layout.item_group;
+
+        private TextView mTextView;
+
+        public GroupViewHolder(View itemView) {
+            super(itemView);
+            mTextView = (TextView) itemView.findViewById(R.id.content);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DataNode node = getData();
+                    node.setIsFolded(!node.isFold());
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                }
+            });
+        }
+
+        @Override
+        protected void onDataSet(GroupNode node) {
+            mTextView.setText(node.getSource().getContent());
+        }
+    }
+
+    private class ChildGroupViewHolder extends BaseViewHolder<ChildGroupNode>{
+        public static final int LAYOUT = R.layout.item_child_group;
+
+
+        private TextView mTextView;
+
+        public ChildGroupViewHolder(View itemView) {
+            super(itemView);
+            mTextView = (TextView) itemView.findViewById(R.id.content);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DataNode node = getData();
+                    node.setIsFolded(!node.isFold());
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                }
+            });
+        }
+
+        @Override
+        protected void onDataSet(ChildGroupNode childGroupNode) {
+            mTextView.setText(childGroupNode.getSource().getContent());
+        }
+    }
+
+    private class ItemViewHolder extends BaseViewHolder<ItemNode>{
+        public static final int LAYOUT = R.layout.item_item;
+
+        private TextView mTextView;
+
+        public ItemViewHolder(View itemView) {
+            super(itemView);
+            mTextView = (TextView) itemView.findViewById(R.id.content);
+        }
+
+        @Override
+        protected void onDataSet(ItemNode itemNode) {
+            mTextView.setText(itemNode.getSource().getContent());
         }
     }
 }

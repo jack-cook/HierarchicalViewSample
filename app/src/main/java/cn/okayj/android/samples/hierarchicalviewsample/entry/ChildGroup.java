@@ -14,12 +14,32 @@
  * limitations under the License.
  */
 
-package cn.okayj.android.samples.hierarchicalviewsample.model;
+package cn.okayj.android.samples.hierarchicalviewsample.entry;
 
-import cn.okayj.android.samples.hierarchicalviewsample.entry.Goods;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Created by Jack on 16/7/12.
+ * Created by Jack on 16/7/13.
  */
-public class GoodsNode extends BaseNode<Goods> {
+public class ChildGroup {
+    private String content;
+
+    private List<Item> itemList = new ArrayList<>();
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public List<Item> getItemList() {
+        return itemList;
+    }
+
+    public void setItemList(List<Item> itemList) {
+        this.itemList = itemList;
+    }
 }

@@ -16,48 +16,47 @@
 
 package cn.okayj.android.samples.hierarchicalviewsample.model;
 
-import cn.okayj.android.samples.hierarchicalviewsample.entry.Cart;
-import cn.okayj.android.samples.hierarchicalviewsample.entry.Goods;
-import cn.okayj.android.samples.hierarchicalviewsample.entry.Shop;
+import java.util.List;
+
+import cn.okayj.android.samples.hierarchicalviewsample.entry.ChildGroup;
+import cn.okayj.android.samples.hierarchicalviewsample.entry.Group;
+import cn.okayj.android.samples.hierarchicalviewsample.entry.Item;
 
 /**
  * Created by Jack on 16/7/12.
  */
 public class TreeBuilder {
-    public static GoodsNode buildGoodsNode(Goods goods){
-        GoodsNode node = new GoodsNode();
-        node.setSource(goods);
-        for (Goods child : goods.getGoods()){
-            node.addChildNode(buildGoodsNode(child));
-        }
-        if(goods.getGoods().size() > 0){
-            node.addFooterNode(buildGoodsFooterNode(goods));
-        }
-
+    public static ItemNode buildItemNode(Item item){
+        ItemNode node = new ItemNode();
+        node.setSource(item);
         return node;
     }
 
-    public static ShopNode buildShopNode(Shop shop){
-        ShopNode node = new ShopNode();
-        node.setSource(shop);
-        for (Goods goods : shop.getGoods()){
-            node.addChildNode(buildGoodsNode(goods));
+    public static ChildGroupNode buildChildGroupNode(ChildGroup childGroup){
+        ChildGroupNode node = new ChildGroupNode();
+        node.setSource(childGroup);
+        for (Item item : childGroup.getItemList()){
+            node.addChildNode(buildItemNode(item));
         }
 
         return node;
     }
 
-    public static GoodsFooterNode buildGoodsFooterNode(Goods goods){
-        GoodsFooterNode node = new GoodsFooterNode();
-        node.setSource(goods);
+    public static GroupNode buildGroupNode(Group group){
+        GroupNode node = new GroupNode();
+        node.setSource(group);
+        for (ChildGroup childGroup : group.getChildGroupList()){
+            node.addChildNode(buildChildGroupNode(childGroup));
+        }
+
         return node;
     }
 
-    public static CartNode buildCartNode(Cart cart){
-        CartNode node = new CartNode();
-        node.setSource(cart);
-        for (Shop shop : cart.getShopList()){
-            node.addChildNode(buildShopNode(shop));
+    public static RootNode buildRootNode(List<Group> groupList){
+        RootNode node = new RootNode();
+        node.setSource(groupList);
+        for (Group group : groupList){
+            node.addChildNode(buildGroupNode(group));
         }
 
         return node;

@@ -16,10 +16,11 @@
 
 package cn.okayj.android.samples.hierarchicalviewsample.model;
 
-import cn.okayj.android.samples.hierarchicalviewsample.entry.Goods;
+import cn.okayj.android.samples.hierarchicalviewsample.entry.Item;
 
 /**
  * Created by Jack on 16/7/13.
  */
-public class GoodsFooterNode extends BaseNode<Goods> {
+public class ItemNode extends BaseNode<Item> {
+
 }

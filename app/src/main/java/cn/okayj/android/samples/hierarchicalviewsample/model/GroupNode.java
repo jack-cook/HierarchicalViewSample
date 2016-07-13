@@ -16,10 +16,11 @@
 
 package cn.okayj.android.samples.hierarchicalviewsample.model;
 
-import cn.okayj.android.samples.hierarchicalviewsample.entry.Shop;
+import cn.okayj.android.samples.hierarchicalviewsample.entry.Group;
 
 /**
- * Created by Jack on 16/7/12.
+ * Created by Jack on 16/7/13.
  */
-public class ShopNode extends BaseNode<Shop> {
+public class GroupNode extends BaseNode<Group>{
+
 }

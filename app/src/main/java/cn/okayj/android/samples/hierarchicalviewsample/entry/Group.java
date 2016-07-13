@@ -20,16 +20,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Jack on 16/7/12.
+ * Created by Jack on 16/7/13.
  */
-public class Cart {
-    List<Shop> shopList = new ArrayList<>();
+public class Group {
+    private String content;
+    private List<ChildGroup> childGroupList = new ArrayList<>();
 
-    public List<Shop> getShopList() {
-        return shopList;
+    public String getContent() {
+        return content;
     }
 
-    public void setShopList(List<Shop> shopList) {
-        this.shopList = shopList;
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public List<ChildGroup> getChildGroupList() {
+        return childGroupList;
+    }
+
+    public void setChildGroupList(List<ChildGroup> childGroupList) {
+        this.childGroupList = childGroupList;
     }
 }

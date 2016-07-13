@@ -16,10 +16,10 @@
 
 package cn.okayj.android.samples.hierarchicalviewsample.model;
 
-import cn.okayj.android.samples.hierarchicalviewsample.entry.Cart;
+import cn.okayj.android.samples.hierarchicalviewsample.entry.ChildGroup;
 
 /**
- * Created by Jack on 16/7/12.
+ * Created by Jack on 16/7/13.
  */
-public class CartNode extends BaseNode<Cart> {
+public class ChildGroupNode extends BaseNode<ChildGroup> {
 }
