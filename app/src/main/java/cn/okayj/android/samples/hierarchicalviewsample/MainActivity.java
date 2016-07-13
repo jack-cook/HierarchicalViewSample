@@ -48,9 +48,9 @@ import cn.okayj.util.NodeFlatIndex;
 public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = "MainActivity";
 
-    List<Group> groupList;
-    RootNode rootNode;
-    NodeFlatIndex.VisibleFlatIndex index;
+    List<Group> groupList;// raw data
+    RootNode rootNode;// root node of the tree
+    NodeFlatIndex.VisibleFlatIndex index;//index for the tree
 
     RecyclerView recyclerView;
 
@@ -65,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(new Adapter());
     }
 
+    /**
+     * init data from json (in asserts/data.js)
+     */
     private void init(){
         InputStreamReader isr = null;
         BufferedReader br = null;
@@ -122,6 +125,9 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getItemViewType(int position) {
+            /*
+            layout res id represent view type
+             */
             DataNode node = index.get(position);
             if(node instanceof ItemNode){
                 return ItemViewHolder.LAYOUT;
