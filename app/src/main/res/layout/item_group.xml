@@ -23,7 +23,7 @@
     android:paddingLeft="15dp"
     android:paddingRight="10dp"
     android:gravity="center"
-    android:background="@color/white"
+    android:background="@drawable/bg_white"
     >
     <TextView
         android:id="@+id/content"

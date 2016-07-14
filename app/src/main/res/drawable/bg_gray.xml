@@ -15,13 +15,11 @@
   ~ limitations under the License.
   -->
 
-<level-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:maxLevel="0">
-        <color android:color="@color/bg_light"/>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <color android:color="@color/bg_dark"></color>
     </item>
-    <item android:maxLevel="1"
-        >
-
-        <color android:color="@color/bg_dark"/>
+    <item>
+        <color android:color="@color/bg_light"></color>
     </item>
-</level-list>
+</selector>
