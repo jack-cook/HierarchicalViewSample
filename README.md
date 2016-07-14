@@ -4,6 +4,10 @@ This is a sample project. It introduce a util which can help you map hierarchica
 
 这个项目是个demo, 介绍如何在ListView 或 RecyclerView中 显示层级复杂的数据。
 
+## Demo
+
+![demo.gif](https://github.com/jack-cook/HierarchicalViewSample/raw/master/demo/demo.gif)
+
 ## Base on
 [JavaUtil][1]
 
