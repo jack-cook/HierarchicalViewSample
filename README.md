@@ -9,9 +9,9 @@ This is a sample project. It introduce a util which can help you map hierarchica
 ![demo.gif](https://github.com/jack-cook/HierarchicalViewSample/raw/master/demo/demo.gif)
 
 ## Base on
-[JavaUtil][1]
+[LinearTree][1]
 
-[1]: https://github.com/jack-cook/JavaUtil
+[1]: https://github.com/jack-cook/LinearTree
 
 ## License
     Licensed under the Apache License, Version 2.0 (the "License");
